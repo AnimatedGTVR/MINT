@@ -1,4 +1,4 @@
-# Gum
+# MINT (FORK OF gum)
 
 <p>
     <a href="https://stuff.charm.sh/gum/nutritional-information.png" target="_blank"><img src="https://stuff.charm.sh/gum/gum.png" alt="Gum Image" width="450" /></a>
