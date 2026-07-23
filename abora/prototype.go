@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -107,6 +108,13 @@ func (o PrototypeOptions) Run() error {
 	fullName, err := collectInput(reader, interactive, "Full name", "Display name for the primary user", "Abora User")
 	if err != nil {
 		return err
+	}
+	passwordHash := ""
+	if o.Execute {
+		passwordHash, err = collectPasswordHash(reader, interactive)
+		if err != nil {
+			return err
+		}
 	}
 
 	if control {
@@ -275,27 +283,28 @@ func (o PrototypeOptions) Run() error {
 		renderMiniHeader("Review")
 	}
 	renderPrototypeSummary(prototypePlan{
-		Edition:    edition,
-		Desktop:    edition,
-		Hostname:   hostname,
-		Username:   username,
-		FullName:   fullName,
-		Disk:       disk,
-		Layout:     layout,
-		Encryption: encryption,
-		Filesystem: filesystem,
-		Swap:       swap,
-		Timezone:   timezone,
-		Locale:     locale,
-		Keyboard:   keyboard,
-		Network:    network,
-		BootMode:   bootMode,
-		Kernel:     kernel,
-		Drivers:    drivers,
-		Updates:    updates,
-		Extras:     extras,
-		FirstBoot:  firstBoot,
-		Dotfiles:   dotfiles,
+		Edition:     edition,
+		Desktop:     edition,
+		Hostname:    hostname,
+		Username:    username,
+		FullName:    fullName,
+		PasswordSet: passwordHash != "",
+		Disk:        disk,
+		Layout:      layout,
+		Encryption:  encryption,
+		Filesystem:  filesystem,
+		Swap:        swap,
+		Timezone:    timezone,
+		Locale:      locale,
+		Keyboard:    keyboard,
+		Network:     network,
+		BootMode:    bootMode,
+		Kernel:      kernel,
+		Drivers:     drivers,
+		Updates:     updates,
+		Extras:      extras,
+		FirstBoot:   firstBoot,
+		Dotfiles:    dotfiles,
 	})
 
 	if err := confirmInstall(reader, interactive); err != nil {
@@ -309,6 +318,33 @@ func (o PrototypeOptions) Run() error {
 	if o.DryRun {
 		fmt.Fprintln(os.Stderr, prototypeOKStyle.Render("Dry run complete. No install steps were simulated."))
 		return nil
+	}
+
+	if o.Execute {
+		return runBackend(o.Backend, prototypePlan{
+			Edition:      edition,
+			Desktop:      edition,
+			Hostname:     hostname,
+			Username:     username,
+			FullName:     fullName,
+			PasswordHash: passwordHash,
+			Disk:         disk,
+			Layout:       layout,
+			Encryption:   encryption,
+			Filesystem:   filesystem,
+			Swap:         swap,
+			Timezone:     timezone,
+			Locale:       locale,
+			Keyboard:     keyboard,
+			Network:      network,
+			BootMode:     bootMode,
+			Kernel:       kernel,
+			Drivers:      drivers,
+			Updates:      updates,
+			Extras:       extras,
+			FirstBoot:    firstBoot,
+			Dotfiles:     dotfiles,
+		})
 	}
 
 	if err := runPrototypeSteps(edition, interactive); err != nil {
@@ -364,27 +400,29 @@ type choiceItem struct {
 }
 
 type prototypePlan struct {
-	Edition    string
-	Desktop    string
-	Hostname   string
-	Username   string
-	FullName   string
-	Disk       string
-	Layout     string
-	Encryption string
-	Filesystem string
-	Swap       string
-	Timezone   string
-	Locale     string
-	Keyboard   string
-	Network    string
-	BootMode   string
-	Kernel     string
-	Drivers    string
-	Updates    string
-	Extras     string
-	FirstBoot  string
-	Dotfiles   string
+	Edition      string
+	Desktop      string
+	Hostname     string
+	Username     string
+	FullName     string
+	PasswordSet  bool
+	PasswordHash string
+	Disk         string
+	Layout       string
+	Encryption   string
+	Filesystem   string
+	Swap         string
+	Timezone     string
+	Locale       string
+	Keyboard     string
+	Network      string
+	BootMode     string
+	Kernel       string
+	Drivers      string
+	Updates      string
+	Extras       string
+	FirstBoot    string
+	Dotfiles     string
 }
 
 func renderPrototypeSummary(plan prototypePlan) {
@@ -397,6 +435,7 @@ func renderPrototypeSummary(plan prototypePlan) {
 		kv("Hostname", plan.Hostname),
 		kv("User", plan.Username),
 		kv("Full name", plan.FullName),
+		kv("Password", present(plan.PasswordSet)),
 		kv("Disk", plan.Disk),
 		kv("Layout", plan.Layout),
 		kv("Filesystem", plan.Filesystem),
@@ -473,6 +512,42 @@ func collectInput(reader *bufio.Reader, interactive bool, title, placeholder, fa
 	return value, nil
 }
 
+func collectPasswordHash(reader *bufio.Reader, interactive bool) (string, error) {
+	var password string
+	var err error
+	if interactive {
+		password, err = runCaptured(func() error {
+			return inputcmd.Options{
+				Header:      "Password",
+				Placeholder: "Password for the primary user",
+				Prompt:      "▸ ",
+				Password:    true,
+				Width:       42,
+				CharLimit:   256,
+				ShowHelp:    true,
+				HeaderStyle: aboraStyle("33", true),
+				PromptStyle: aboraStyle("33", true),
+				CursorStyle: aboraStyle("33", true),
+			}.Run()
+		})
+	} else {
+		password, err = promptText(reader, "Password", "")
+	}
+	if err != nil {
+		return "", err
+	}
+	if password == "" {
+		return "", fmt.Errorf("password cannot be empty")
+	}
+	cmd := exec.Command("openssl", "passwd", "-6", "-stdin")
+	cmd.Stdin = strings.NewReader(password + "\n")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("could not hash password with openssl: %w", err)
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
 func confirmInstall(reader *bufio.Reader, interactive bool) error {
 	if !interactive {
 		choice, err := promptChoice(reader, "Start prototype install?", []choiceItem{
@@ -503,6 +578,140 @@ func confirmInstall(reader *bufio.Reader, interactive bool) error {
 		return err
 	}
 	return nil
+}
+
+func runBackend(backend string, plan prototypePlan) error {
+	params, err := writeBatchParams(plan)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintln(os.Stderr, prototypeBlueStyle.Render("Starting real Abora installer backend..."))
+	fmt.Fprintln(os.Stderr, prototypeHelpStyle.Render("Batch params: "+params))
+
+	cmd := exec.Command("bash", backend, "--batch", params)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stderr
+	cmd.Stderr = os.Stderr
+	cmd.Env = append(os.Environ(),
+		"ABORA_DESKTOP_PROFILES_LIB="+envDefault("ABORA_DESKTOP_PROFILES_LIB", "/etc/abora/desktop-profiles.sh"),
+		"ABORA_APP_CATALOG_LIB="+envDefault("ABORA_APP_CATALOG_LIB", "/etc/abora/app-catalog.sh"),
+	)
+	return cmd.Run()
+}
+
+func writeBatchParams(plan prototypePlan) (string, error) {
+	file, err := os.CreateTemp("", "abora-mint-batch-*.sh")
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	appsLabel := mapChoice(plan.Extras, map[string]string{
+		"essentials": "Essentials",
+		"gaming":     "Gaming",
+		"creator":    "Creator",
+		"developer":  "Developer",
+	}, "Essentials")
+	desktop := normalizeBackendDesktop(plan.Edition)
+	xkb := xkbForKeyboard(plan.Keyboard)
+	gpu := backendGPU(plan.Drivers)
+	dotfiles := ""
+	if plan.Dotfiles != "skip" {
+		dotfiles = plan.Dotfiles
+	}
+	values := map[string]string{
+		"disk":                      plan.Disk,
+		"hostname_value":            plan.Hostname,
+		"username_value":            plan.Username,
+		"timezone_value":            plan.Timezone,
+		"keyboard_value":            plan.Keyboard,
+		"xkb_layout_value":          xkb,
+		"locale_value":              plan.Locale,
+		"language_label":            plan.Locale,
+		"desktop_profile":           desktop,
+		"desktop_label":             desktop,
+		"desktop_variant_id":        desktop,
+		"gpu_value":                 gpu,
+		"starter_apps_bundle":       plan.Extras,
+		"starter_apps_label":        appsLabel,
+		"install_apps_during_setup": mapChoice(plan.Updates, map[string]string{"install": "yes", "defer": "no"}, "no"),
+		"anix_enabled":              "yes",
+		"github_identity":           "Skipped",
+		"user_password_hash":        plan.PasswordHash,
+		"root_password_hash":        plan.PasswordHash,
+		"root_password_mode":        "same",
+		"dotfiles_url":              dotfiles,
+	}
+	for _, key := range batchKeys() {
+		if _, err := fmt.Fprintf(file, "%s=%s\n", key, shellQuote(values[key])); err != nil {
+			return "", err
+		}
+	}
+	return file.Name(), nil
+}
+
+func batchKeys() []string {
+	return []string{
+		"disk", "hostname_value", "username_value", "timezone_value", "keyboard_value",
+		"xkb_layout_value", "locale_value", "language_label", "desktop_profile",
+		"desktop_label", "desktop_variant_id", "gpu_value", "starter_apps_bundle",
+		"starter_apps_label", "install_apps_during_setup", "anix_enabled",
+		"github_identity", "user_password_hash", "root_password_hash",
+		"root_password_mode", "dotfiles_url",
+	}
+}
+
+func shellQuote(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "'\"'\"'") + "'"
+}
+
+func normalizeBackendDesktop(edition string) string {
+	if edition == "kde" {
+		return "plasma"
+	}
+	return edition
+}
+
+func xkbForKeyboard(keyboard string) string {
+	switch keyboard {
+	case "gb":
+		return "gb"
+	case "de":
+		return "de"
+	case "fr":
+		return "fr"
+	default:
+		return "us"
+	}
+}
+
+func backendGPU(driver string) string {
+	switch driver {
+	case "nvidia", "mesa", "minimal":
+		if driver == "mesa" {
+			return "auto"
+		}
+		if driver == "minimal" {
+			return "none"
+		}
+		return driver
+	default:
+		return "auto"
+	}
+}
+
+func mapChoice(value string, choices map[string]string, fallback string) string {
+	if mapped, ok := choices[value]; ok {
+		return mapped
+	}
+	return fallback
+}
+
+func envDefault(key, fallback string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return fallback
 }
 
 func runCaptured(run func() error) (string, error) {

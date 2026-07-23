@@ -33,6 +33,8 @@ type PrototypeOptions struct {
 	TTY       bool   `help:"Force TTY-safe logo rendering"`
 	Kitty     bool   `help:"Force Kitty graphics logo rendering"`
 	DryRun    bool   `help:"Show the flow without pretending to install files"`
+	Execute   bool   `help:"Run the real Abora installer backend after confirmation"`
+	Backend   string `help:"Installer backend script" default:"/etc/abora/installer.sh"`
 	NoControl bool   `help:"Do not clear or take over the terminal"`
 	Hostname  string `help:"Default target hostname" default:"abora"`
 	Disk      string `help:"Default target disk" default:"/dev/vda"`
