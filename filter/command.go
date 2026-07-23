@@ -7,15 +7,15 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/AnimatedGTVR/MINT/internal/files"
+	"github.com/AnimatedGTVR/MINT/internal/stdin"
+	"github.com/AnimatedGTVR/MINT/internal/timeout"
+	"github.com/AnimatedGTVR/MINT/internal/tty"
+	"github.com/AnimatedGTVR/MINT/style"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/gum/internal/files"
-	"github.com/charmbracelet/gum/internal/stdin"
-	"github.com/charmbracelet/gum/internal/timeout"
-	"github.com/charmbracelet/gum/internal/tty"
-	"github.com/charmbracelet/gum/style"
 	"github.com/charmbracelet/x/ansi"
 	"github.com/sahilm/fuzzy"
 )
@@ -43,7 +43,7 @@ func (o Options) Run() error {
 	}
 
 	if len(o.Options) == 0 {
-		return errors.New("no options provided, see `gum filter --help`")
+		return errors.New("no options provided, see `mint filter --help`")
 	}
 
 	ctx, cancel := timeout.Context(o.Timeout)

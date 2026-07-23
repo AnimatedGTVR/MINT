@@ -3,34 +3,38 @@ package main
 import (
 	"github.com/alecthomas/kong"
 
-	"github.com/charmbracelet/gum/choose"
-	"github.com/charmbracelet/gum/completion"
-	"github.com/charmbracelet/gum/confirm"
-	"github.com/charmbracelet/gum/file"
-	"github.com/charmbracelet/gum/filter"
-	"github.com/charmbracelet/gum/format"
-	"github.com/charmbracelet/gum/input"
-	"github.com/charmbracelet/gum/join"
-	"github.com/charmbracelet/gum/log"
-	"github.com/charmbracelet/gum/man"
-	"github.com/charmbracelet/gum/pager"
-	"github.com/charmbracelet/gum/spin"
-	"github.com/charmbracelet/gum/style"
-	"github.com/charmbracelet/gum/table"
-	"github.com/charmbracelet/gum/version"
-	"github.com/charmbracelet/gum/write"
+	"github.com/AnimatedGTVR/MINT/abora"
+	"github.com/AnimatedGTVR/MINT/choose"
+	"github.com/AnimatedGTVR/MINT/completion"
+	"github.com/AnimatedGTVR/MINT/confirm"
+	"github.com/AnimatedGTVR/MINT/file"
+	"github.com/AnimatedGTVR/MINT/filter"
+	"github.com/AnimatedGTVR/MINT/format"
+	"github.com/AnimatedGTVR/MINT/input"
+	"github.com/AnimatedGTVR/MINT/join"
+	"github.com/AnimatedGTVR/MINT/log"
+	"github.com/AnimatedGTVR/MINT/man"
+	"github.com/AnimatedGTVR/MINT/pager"
+	"github.com/AnimatedGTVR/MINT/spin"
+	"github.com/AnimatedGTVR/MINT/style"
+	"github.com/AnimatedGTVR/MINT/table"
+	"github.com/AnimatedGTVR/MINT/version"
+	"github.com/AnimatedGTVR/MINT/write"
 )
 
-// Gum is the command-line interface for Gum.
-type Gum struct {
+// MINT is the command-line interface for Abora OS terminal UI helpers.
+type MINT struct {
 	// Version is a flag that can be used to display the version number.
 	Version kong.VersionFlag `short:"v" help:"Print the version number"`
 
-	// Completion generates Gum shell completion scripts.
+	// Completion generates MINT shell completion scripts.
 	Completion completion.Completion `cmd:"" hidden:"" help:"Request shell completion"`
 
-	// Man is a hidden command that generates Gum man pages.
+	// Man is a hidden command that generates MINT man pages.
 	Man man.Man `cmd:"" hidden:"" help:"Generate man pages"`
+
+	// Abora contains installer-focused helpers for Abora OS scripts.
+	Abora abora.Options `cmd:"" help:"Abora OS installer helpers"`
 
 	// Choose provides an interface to choose one option from a given list of
 	// options. The options can be provided as (new-line separated) stdin or a
@@ -39,9 +43,9 @@ type Gum struct {
 	// It is different from the filter command as it does not provide a fuzzy
 	// finding input, so it is best used for smaller lists of options.
 	//
-	// Let's pick from a list of gum flavors:
+	// Let's pick from a list of desktop environments:
 	//
-	// $ gum choose "Strawberry" "Banana" "Cherry"
+	// $ mint choose "COSMIC" "GNOME" "KDE"
 	//
 	Choose choose.Options `cmd:"" help:"Choose an option from a list of choices"`
 
@@ -55,7 +59,7 @@ type Gum struct {
 	//
 	// I.e. confirm if the user wants to delete a file
 	//
-	// $ gum confirm "Are you sure?" && rm file.txt
+	// $ mint confirm "Are you sure?" && rm file.txt
 	//
 	Confirm confirm.Options `cmd:"" help:"Ask a user to confirm an action"`
 
@@ -65,12 +69,12 @@ type Gum struct {
 	//
 	// Let's pick a file from the current directory:
 	//
-	// $ gum file
-	// $ gum file .
+	// $ mint file
+	// $ mint file .
 	//
 	// Let's pick a file from the home directory:
 	//
-	// $ gum file $HOME
+	// $ mint file $HOME
 	File file.Options `cmd:"" help:"Pick a file from a folder"`
 
 	// Filter provides a fuzzy searching text input to allow filtering a list of
@@ -80,9 +84,9 @@ type Gum struct {
 	// for the user to choose one, but the script (or user) can provide different
 	// new-line separated options to choose from.
 	//
-	// I.e. let's pick from a list of gum flavors:
+	// I.e. let's pick from a list of options:
 	//
-	// $ cat flavors.text | gum filter
+	// $ cat choices.txt | mint filter
 	//
 	Filter filter.Options `cmd:"" help:"Filter items from a list"`
 
@@ -97,7 +101,7 @@ type Gum struct {
 	// It can be used to prompt the user for some input. The text the user
 	// entered will be sent to stdout.
 	//
-	// $ gum input --placeholder "What's your favorite gum?" > answer.text
+	// $ mint input --placeholder "Hostname" > answer.text
 	//
 	Input input.Options `cmd:"" help:"Prompt for some input"`
 
@@ -109,11 +113,11 @@ type Gum struct {
 	// Note: We wrap the variable in quotes to ensure the new lines are part of a
 	// single argument. Otherwise, the command won't work as expected.
 	//
-	// $ gum join --horizontal "$BUBBLE_BOX" "$GUM_BOX"
+	// $ mint join --horizontal "$LEFT_BOX" "$RIGHT_BOX"
 	//
 	//   ╔══════════════════════╗╔═════════════╗
 	//   ║                      ║║             ║
-	//   ║        Bubble        ║║     Gum     ║
+	//   ║        Left          ║║     Right   ║
 	//   ║                      ║║             ║
 	//   ╚══════════════════════╝╚═════════════╝
 	//
@@ -125,11 +129,11 @@ type Gum struct {
 	// It allows the user to scroll through content like a pager.
 	//
 	// ╭────────────────────────────────────────────────╮
-	// │    1 │ Gum Pager                               │
+	// │    1 │ MINT Pager                              │
 	// │    2 │ =========                               │
 	// │    3 │                                         │
 	// │    4 │ ```                                     │
-	// │    5 │ gum pager --height 10 --width 25 < text │
+	// │    5 │ mint pager --height 10 --width 25 < text│
 	// │    6 │ ```                                     │
 	// │    7 │                                         │
 	// │    8 │                                         │
@@ -149,7 +153,7 @@ type Gum struct {
 	// We can simply prepend a spinner to this task to show it to the user,
 	// while performing the task / command in the background.
 	//
-	// $ gum spin -t "Taking a nap..." -- sleep 5
+	// $ mint spin -t "Installing packages..." -- sleep 5
 	//
 	// The spinner will automatically exit when the task is complete.
 	//
@@ -163,16 +167,16 @@ type Gum struct {
 	//
 	// Let's make some text glamorous using bash:
 	//
-	// $ gum style \
+	// $ mint style \
 	//  	--foreground 212 --border double --align center \
 	//  	--width 50 --margin 2 --padding "2 4" \
-	//  	"Bubble Gum (1¢)" "So sweet and so fresh\!"
+	//  	"Abora OS" "Ready to install"
 	//
 	//
 	//    ╔══════════════════════════════════════════════════╗
 	//    ║                                                  ║
 	//    ║                                                  ║
-	//    ║                 Bubble Gum (1¢)                  ║
+	//    ║                   Abora OS                       ║
 	//    ║              So sweet and so fresh!              ║
 	//    ║                                                  ║
 	//    ║                                                  ║
@@ -186,9 +190,9 @@ type Gum struct {
 	// It is useful to render tabular (CSV) data in a terminal and allows
 	// the user to select a row from the table.
 	//
-	// Let's render a table of gum flavors:
+	// Let's render a table:
 	//
-	// $ gum table <<< "Flavor,Price\nStrawberry,$0.50\nBanana,$0.99\nCherry,$0.75"
+	// $ mint table <<< "Edition,Desktop\nCosmic,COSMIC\nGnome,GNOME\nKDE,KDE"
 	//
 	//  Flavor      Price
 	//  Strawberry  $0.50
@@ -203,7 +207,7 @@ type Gum struct {
 	// It can be used to ask the user to write some long form of text
 	// (multi-line) input. The text the user entered will be sent to stdout.
 	//
-	// $ gum write > output.text
+	// $ mint write > output.text
 	//
 	Write write.Options `cmd:"" help:"Prompt for long-form text"`
 
@@ -212,17 +216,17 @@ type Gum struct {
 	//
 	// It can be used to log messages to output.
 	//
-	// $ gum log --level info "Hello, world!"
+	// $ mint log --level info "Hello, world!"
 	//
 	Log log.Options `cmd:"" help:"Log messages to output"`
 
-	// VersionCheck provides a command that checks if the current gum version
+	// VersionCheck provides a command that checks if the current MINT version
 	// matches a given semantic version constraint.
 	//
-	// It can be used to check that a minimum gum version is installed in a
+	// It can be used to check that a minimum MINT version is installed in a
 	// script.
 	//
-	// $ gum version-check '~> 0.15'
+	// $ mint version-check '~> 0.15'
 	//
-	VersionCheck version.Options `cmd:"" help:"Semver check current gum version"`
+	VersionCheck version.Options `cmd:"" help:"Semver check current MINT version"`
 }

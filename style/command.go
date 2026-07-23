@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/gum/internal/stdin"
+	"github.com/AnimatedGTVR/MINT/internal/stdin"
 )
 
 // Run provides a shell script interface for the Lip Gloss styling.
@@ -22,7 +22,7 @@ func (o Options) Run() error {
 	} else {
 		text, _ = stdin.Read(stdin.StripANSI(o.StripANSI))
 		if text == "" {
-			return errors.New("no input provided, see `gum style --help`")
+			return errors.New("no input provided, see `mint style --help`")
 		}
 	}
 	if o.Trim {

@@ -1,4 +1,4 @@
-// Package main is Gum: a tool for glamorous shell scripts.
+// Package main is MINT: Abora OS terminal UI tools for shell scripts.
 package main
 
 import (
@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"strings"
 
+	"github.com/AnimatedGTVR/MINT/internal/exit"
 	"github.com/alecthomas/kong"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/gum/internal/exit"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
 )
@@ -26,10 +27,11 @@ var (
 	CommitSHA = ""
 )
 
-var bubbleGumPink = lipgloss.NewStyle().Foreground(lipgloss.Color("212"))
+var mintAccent = lipgloss.NewStyle().Foreground(lipgloss.Color("43"))
 
 func main() {
 	lipgloss.SetColorProfile(termenv.NewOutput(os.Stderr).Profile)
+	applyMINTEnvironmentAliases()
 
 	if Version == "" {
 		if info, ok := debug.ReadBuildInfo(); ok && info.Main.Sum != "" {
@@ -38,15 +40,17 @@ func main() {
 			Version = "unknown (built from source)"
 		}
 	}
-	version := fmt.Sprintf("gum version %s", Version)
+	commandName := commandName()
+	version := fmt.Sprintf("%s version %s", commandName, Version)
 	if len(CommitSHA) >= shaLen {
 		version += " (" + CommitSHA[:shaLen] + ")"
 	}
 
-	gum := &Gum{}
+	mint := &MINT{}
 	ctx := kong.Parse(
-		gum,
-		kong.Description(fmt.Sprintf("A tool for %s shell scripts.", bubbleGumPink.Render("glamorous"))),
+		mint,
+		kong.Name(commandName),
+		kong.Description(fmt.Sprintf("Abora OS terminal UI tools for %s shell scripts.", mintAccent.Render("guided"))),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact:             true,
@@ -71,6 +75,7 @@ func main() {
 			"defaultFaint":            "false",
 			"defaultItalic":           "false",
 			"defaultStrikethrough":    "false",
+			"defaultLogoPath":         "/home/animatedpc/Work/abora-os/assets/Abora-Text.png",
 		},
 	)
 	if err := ctx.Run(); err != nil {
@@ -87,5 +92,29 @@ func main() {
 		}
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
+	}
+}
+
+func commandName() string {
+	name := os.Args[0]
+	if idx := strings.LastIndex(name, "/"); idx >= 0 {
+		name = name[idx+1:]
+	}
+	if name == "" {
+		return "gum"
+	}
+	return name
+}
+
+func applyMINTEnvironmentAliases() {
+	for _, entry := range os.Environ() {
+		key, value, ok := strings.Cut(entry, "=")
+		if !ok || !strings.HasPrefix(key, "MINT_") {
+			continue
+		}
+		gumKey := "GUM_" + strings.TrimPrefix(key, "MINT_")
+		if _, exists := os.LookupEnv(gumKey); !exists {
+			_ = os.Setenv(gumKey, value)
+		}
 	}
 }

@@ -1,20 +1,74 @@
-# MINT (FORK OF gum)
+# MINT
 
-<p>
-    <a href="https://stuff.charm.sh/gum/nutritional-information.png" target="_blank"><img src="https://stuff.charm.sh/gum/gum.png" alt="Gum Image" width="450" /></a>
-    <br><br>
-    <a href="https://github.com/charmbracelet/gum/releases"><img src="https://img.shields.io/github/release/charmbracelet/gum.svg" alt="Latest Release"></a>
-    <a href="https://pkg.go.dev/github.com/charmbracelet/gum?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="Go Docs"></a>
-    <a href="https://github.com/charmbracelet/gum/actions"><img src="https://github.com/charmbracelet/gum/workflows/build/badge.svg" alt="Build Status"></a>
-</p>
+MINT is Abora OS's terminal UI helper for guided shell scripts and installers.
+It is based on Charmbracelet Gum, with Abora-focused naming, defaults, packaging,
+and installer/TUI workflow polish.
 
+<<<<<<< HEAD
 Yep Its another tool, for AboraOS someone has made LMAO.
 
 
 A tool for glamorous shell scripts. Leverage the power of
+=======
+Use it in Abora scripts as `mint`:
+
+```bash
+make install
+mint choose "COSMIC Edition" "GNOME Edition" "KDE Edition"
+mint confirm "Install Abora OS to disk?"
+mint spin --title "Installing Abora OS..." -- sudo abora install pre-alpha
+```
+
+Try the safe Abora installer prototype:
+
+```bash
+mint abora prototype --tty --pre-alpha
+```
+
+For desktop demos in Kitty, use the real image renderer:
+
+```bash
+mint abora prototype --kitty --pre-alpha
+```
+
+This shows the logo, blue Gum-style welcome and edition pickers, input prompts,
+localization, keyboard, network, partitioning, filesystem, swap, boot options,
+kernel/driver/software choices, confirmation controls, pre-alpha risk
+acknowledgement, a full install plan, spinner-backed simulated install steps,
+and a completion screen without changing any disks.
+In an interactive terminal it uses an alternate screen, clears between pages,
+sets the terminal title, and restores the terminal when it exits.
+
+Installer-specific helpers:
+
+```bash
+mint abora logo --path /home/animatedpc/Work/abora-os/assets/Abora-Text.png
+action="$(mint abora welcome)"
+edition="$(mint abora edition)"
+mint abora risk
+mint abora summary --edition "$edition" --desktop "$edition" --disk /dev/nvme0n1
+sudo abora install "$edition"
+```
+
+`mint abora risk` requires the exact phrase `I ACCEPT THE RISK`, which matches
+the Abora pre-alpha install warning flow.
+
+For terminals with graphics protocol support, MINT can render the real image:
+
+```bash
+mint abora logo --mode pixels
+mint abora logo --mode kitty
+```
+
+MINT leverages the power of
+>>>>>>> 7d767c1 (yay)
 [Bubbles](https://github.com/charmbracelet/bubbles) and [Lip
 Gloss](https://github.com/charmbracelet/lipgloss) in your scripts and aliases
 without writing any Go code!
+
+The rest of this README still contains upstream Gum examples while the fork is
+being reshaped for Abora OS. In new Abora scripts, prefer `mint` wherever older
+examples say `gum`.
 
 <img alt="Shell running the ./demo.sh script" width="600" src="https://vhs.charm.sh/vhs-1qY57RrQlXCuydsEgDp68G.gif">
 
@@ -56,7 +110,7 @@ Confirm before committing:
 gum confirm "Commit changes?" && git commit -m "$SUMMARY" -m "$DESCRIPTION"
 ```
 
-Check out the [complete example](https://github.com/charmbracelet/gum/blob/main/examples/commit.sh) for combining these commands in a single script.
+Check out the [complete example](https://github.com/AnimatedGTVR/MINT/blob/main/examples/commit.sh) for combining these commands in a single script.
 
 <img alt="Running the ./examples/commit.sh script to commit to git" width="600" src="https://vhs.charm.sh/vhs-7rRq3LsEuJVwhwr0xf6Er7.gif">
 
@@ -140,10 +194,10 @@ Or download it:
 Or just install it with `go`:
 
 ```bash
-go install github.com/charmbracelet/gum@latest
+go install github.com/AnimatedGTVR/MINT@latest
 ```
 
-[releases]: https://github.com/charmbracelet/gum/releases
+[releases]: https://github.com/AnimatedGTVR/MINT/releases
 
 ## Commands
 
@@ -321,7 +375,7 @@ gum style \
 	'Bubble Gum (1¢)' 'So sweet and so fresh!'
 ```
 
-<img src="https://github.com/charmbracelet/gum/assets/42545625/67468acf-b3e0-4e78-bd89-360739eb44fa" width="600" alt="Bubble Gum, So sweet and so fresh!" />
+<img src="https://github.com/AnimatedGTVR/MINT/assets/42545625/67468acf-b3e0-4e78-bd89-360739eb44fa" width="600" alt="Bubble Gum, So sweet and so fresh!" />
 
 ## Join
 
@@ -342,7 +396,7 @@ BUBBLE_GUM=$(gum join "$BUBBLE" "$GUM")
 gum join --align center --vertical "$I_LOVE" "$BUBBLE_GUM"
 ```
 
-<img src="https://github.com/charmbracelet/gum/assets/42545625/68f7a25d-b495-48dd-982a-cee0c8ea5786" width="600" alt="I LOVE Bubble Gum written out in four boxes with double borders around them." />
+<img src="https://github.com/AnimatedGTVR/MINT/assets/42545625/68f7a25d-b495-48dd-982a-cee0c8ea5786" width="600" alt="I LOVE Bubble Gum written out in four boxes with double borders around them." />
 
 ## Format
 
@@ -369,7 +423,7 @@ For more information on template helpers, see the [Termenv
 docs](https://github.com/muesli/termenv#template-helpers). For a full list of
 named emojis see the [GitHub API](https://api.github.com/emojis).
 
-<img src="https://github.com/charmbracelet/gum/assets/42545625/5cfbb0c8-0022-460d-841b-fec37527ca66" width="300" alt="Running gum format for different types of formats" />
+<img src="https://github.com/AnimatedGTVR/MINT/assets/42545625/5cfbb0c8-0022-460d-841b-fec37527ca66" width="300" alt="Running gum format for different types of formats" />
 
 ## Log
 
@@ -467,7 +521,7 @@ alias please="gum input --password | sudo -nS"
 
 See [contributing][contribute].
 
-[contribute]: https://github.com/charmbracelet/gum/contribute
+[contribute]: https://github.com/AnimatedGTVR/MINT/contribute
 
 ## Feedback
 
@@ -479,7 +533,7 @@ We’d love to hear your thoughts on this project. Feel free to drop us a note!
 
 ## License
 
-[MIT](https://github.com/charmbracelet/gum/raw/main/LICENSE)
+[MIT](https://github.com/AnimatedGTVR/MINT/raw/main/LICENSE)
 
 ---
 

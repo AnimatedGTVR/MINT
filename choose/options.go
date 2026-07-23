@@ -3,7 +3,7 @@ package choose
 import (
 	"time"
 
-	"github.com/charmbracelet/gum/style"
+	"github.com/AnimatedGTVR/MINT/style"
 )
 
 // Options is the customization options for the choose command.

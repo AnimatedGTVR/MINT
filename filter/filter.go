@@ -5,9 +5,9 @@
 // for the user to choose one, but the script (or user) can provide different
 // new-line separated options to choose from.
 //
-// I.e. let's pick from a list of gum flavors:
+// I.e. let's pick from a list of options:
 //
-// $ cat flavors.text | gum filter
+// $ cat choices.text | mint filter
 package filter
 
 import (

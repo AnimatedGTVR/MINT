@@ -20,7 +20,7 @@ func (o Options) Run(ctx *kong.Context) error {
 		return fmt.Errorf("could not parse version %s: %w", current, err)
 	}
 	if !c.Check(v) {
-		return fmt.Errorf("gum version %q is not within given range %q", current, o.Constraint)
+		return fmt.Errorf("mint version %q is not within given range %q", current, o.Constraint)
 	}
 	return nil
 }

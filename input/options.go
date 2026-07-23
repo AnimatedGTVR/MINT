@@ -3,7 +3,7 @@ package input
 import (
 	"time"
 
-	"github.com/charmbracelet/gum/style"
+	"github.com/AnimatedGTVR/MINT/style"
 )
 
 // Options are the customization options for the input.

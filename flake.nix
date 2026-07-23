@@ -1,5 +1,5 @@
 {
-  description = "A tool for glamorous shell scripts";
+  description = "Abora OS terminal UI tools for guided shell scripts";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -12,8 +12,8 @@
       rec {
         packages.default = import ./default.nix { inherit pkgs; };
       }) // {
-        overlays.default = final: prev: { 
-          gum = import ./default.nix { pkgs = final; };
+        overlays.default = final: prev: {
+          mint = import ./default.nix { pkgs = final; };
         };
       };
 }

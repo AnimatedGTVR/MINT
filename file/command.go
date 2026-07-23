@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/AnimatedGTVR/MINT/internal/timeout"
+	"github.com/AnimatedGTVR/MINT/style"
 	"github.com/charmbracelet/bubbles/filepicker"
 	"github.com/charmbracelet/bubbles/help"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/gum/internal/timeout"
-	"github.com/charmbracelet/gum/style"
 )
 
 // Run is the interface to picking a file.

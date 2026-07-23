@@ -1,4 +1,4 @@
-module github.com/charmbracelet/gum
+module github.com/AnimatedGTVR/MINT
 
 go 1.25.8
 

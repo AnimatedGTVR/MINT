@@ -8,13 +8,13 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/AnimatedGTVR/MINT/internal/stdin"
+	"github.com/AnimatedGTVR/MINT/internal/timeout"
+	"github.com/AnimatedGTVR/MINT/internal/tty"
+	"github.com/AnimatedGTVR/MINT/style"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/gum/internal/stdin"
-	"github.com/charmbracelet/gum/internal/timeout"
-	"github.com/charmbracelet/gum/internal/tty"
-	"github.com/charmbracelet/gum/style"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -31,7 +31,7 @@ func (o Options) Run() error {
 		o.Selected = strings.Split(input, o.InputDelimiter)
 	} else if len(o.Options) == 0 {
 		if input == "" {
-			return errors.New("no options provided, see `gum choose --help`")
+			return errors.New("no options provided, see `mint choose --help`")
 		}
 		o.Options = strings.Split(input, o.InputDelimiter)
 	}

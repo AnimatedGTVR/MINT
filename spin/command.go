@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/AnimatedGTVR/MINT/internal/exit"
+	"github.com/AnimatedGTVR/MINT/internal/timeout"
+	"github.com/AnimatedGTVR/MINT/style"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/gum/internal/exit"
-	"github.com/charmbracelet/gum/internal/timeout"
-	"github.com/charmbracelet/gum/style"
 	"github.com/charmbracelet/x/term"
 )
 

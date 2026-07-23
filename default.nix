@@ -2,7 +2,7 @@
 
 pkgs.buildGoModule rec {
   pname = "gum";
-  version = "0.15.2";
+  version = "0.15.2-abora";
 
   src = ./.;
 

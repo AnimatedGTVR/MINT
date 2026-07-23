@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/AnimatedGTVR/MINT/internal/exit"
+	"github.com/AnimatedGTVR/MINT/internal/stdin"
+	"github.com/AnimatedGTVR/MINT/internal/timeout"
+	"github.com/AnimatedGTVR/MINT/style"
 	"github.com/charmbracelet/bubbles/help"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/gum/internal/exit"
-	"github.com/charmbracelet/gum/internal/stdin"
-	"github.com/charmbracelet/gum/internal/timeout"
-	"github.com/charmbracelet/gum/style"
 )
 
 // Run provides a shell script interface for prompting a user to confirm an

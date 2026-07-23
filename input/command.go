@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/AnimatedGTVR/MINT/cursor"
+	"github.com/AnimatedGTVR/MINT/internal/stdin"
+	"github.com/AnimatedGTVR/MINT/internal/timeout"
+	"github.com/AnimatedGTVR/MINT/style"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/gum/cursor"
-	"github.com/charmbracelet/gum/internal/stdin"
-	"github.com/charmbracelet/gum/internal/timeout"
-	"github.com/charmbracelet/gum/style"
 )
 
 // Run provides a shell script interface for the text input bubble.

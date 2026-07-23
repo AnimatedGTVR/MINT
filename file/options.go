@@ -3,7 +3,7 @@ package file
 import (
 	"time"
 
-	"github.com/charmbracelet/gum/style"
+	"github.com/AnimatedGTVR/MINT/style"
 )
 
 // Options are the options for the file command.

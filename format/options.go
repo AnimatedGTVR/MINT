@@ -1,4 +1,4 @@
-//nolint
+// nolint
 package format
 
 // Options is customization options for the format command.

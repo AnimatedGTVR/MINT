@@ -4,6 +4,8 @@ test
 
 # Binaries
 gum
+mint
+bin/
 dist
 testdata
 
