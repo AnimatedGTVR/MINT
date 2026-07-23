@@ -4,8 +4,6 @@ MINT is Abora OS's terminal UI helper for guided shell scripts and installers.
 It is based on Charmbracelet Gum, with Abora-focused naming, defaults, packaging,
 and installer/TUI workflow polish.
 
-<<<<<<< HEAD
-Yep Its another tool, for AboraOS someone has made LMAO.
 
 
 A tool for glamorous shell scripts. Leverage the power of
