@@ -8,6 +8,9 @@
     <a href="https://github.com/charmbracelet/gum/actions"><img src="https://github.com/charmbracelet/gum/workflows/build/badge.svg" alt="Build Status"></a>
 </p>
 
+Yep Its another tool, for AboraOS someone has made LMAO.
+
+
 A tool for glamorous shell scripts. Leverage the power of
 [Bubbles](https://github.com/charmbracelet/bubbles) and [Lip
 Gloss](https://github.com/charmbracelet/lipgloss) in your scripts and aliases
